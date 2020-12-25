@@ -102,8 +102,10 @@ public class ChooseAreaFragment extends Fragment {
         });
         queryProvinces();
     }
+    /*查询全国所有的省，优先从数据库查询，如果没有查询到再服务器上器查询*/
     private void queryProvinces(){
         titleText.setText("中国");
+
         backButton.setVisibility(View.GONE);
         provinceList = LitePal.findAll(Province.class);
         if (provinceList.size() >0){
@@ -111,14 +113,18 @@ public class ChooseAreaFragment extends Fragment {
             for (Province province : provinceList){
                 dataList.add(province.getProvinceName());
             }
+
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         } else {
-            String address = "http://guolin.tech/api/china/";
+            String address = "http://10.10.80.230:8080/coolweatherapi_war_exploded/China/";
+
             queryFromServer(address,"province");
+
         }
     }
+    /*查询全国所有的市，优先从数据库查询，如果没有查询到再服务器上器查询*/
     private void queryCities(){
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
@@ -133,10 +139,11 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode;
+            String address = "http://10.10.80.230:8080/coolweatherapi_war_exploded/China/"+provinceCode;
             queryFromServer(address,"city");
         }
     }
+    /*查询全国所有的县，优先从数据库查询，如果没有查询到再服务器上器查询*/
     private  void queryCounties(){
         titleText.setText(selectedCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
@@ -154,11 +161,11 @@ public class ChooseAreaFragment extends Fragment {
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
+            String address = "http://10.10.80.230:8080/coolweatherapi_war_exploded/China/"+provinceCode+"/"+cityCode;
             queryFromServer(address,"county");
         }
     }
-
+        /*根据传入的地址和类型从服务器上查询省市县数据*/
     private void queryFromServer(String address,final String type){
         showProgressDialog();
         HttpUtil.sendOkHttpRequest(address,new Callback() {
@@ -204,7 +211,7 @@ public class ChooseAreaFragment extends Fragment {
             }
         });
     }
-
+/*显示进度对话框*/
     private  void  showProgressDialog(){
         if (progressDialog == null){
             progressDialog = new ProgressDialog(getActivity());
@@ -213,6 +220,7 @@ public class ChooseAreaFragment extends Fragment {
         }
         progressDialog.show();
     }
+    /*关闭进度对话框*/
     private void closeProgressDialog(){
         if (progressDialog !=null){
             progressDialog.dismiss();
